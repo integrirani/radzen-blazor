@@ -118,19 +118,6 @@ namespace Radzen.Blazor
         public long? MaxLength { get; set; }
 
         /// <summary>
-        /// Gets search input reference.
-        /// </summary>
-        protected ElementReference search;
-
-        /// <summary>
-        /// Gets list element reference.
-        /// </summary>
-        protected ElementReference list;
-
-        string customSearchText;
-        int selectedIndex = -1;
-
-        /// <summary>
         /// Handles the <see cref="E:FilterKeyPress" /> event.
         /// </summary>
         /// <param name="args">The <see cref="KeyboardEventArgs"/> instance containing the event data.</param>
@@ -195,9 +182,8 @@ namespace Radzen.Blazor
             }
             else
             {
-                customSearchText = value;
                 searchText = value;
-                await InvokeAsync(() => { LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Filter = customSearchText }); });
+                await InvokeAsync(() => { LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Filter = searchText }); });
             }
         }
 

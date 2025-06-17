@@ -9,6 +9,7 @@
     <RadzenText @bind-Text=@SelectedItem/>
      
     <RadzenLookup TValue="Model"
+                  OpenOnFocus="true"
                   AllowVirtualization="true"
                   Data="@Data"
                   LoadData="LoadData"
@@ -61,6 +62,10 @@
             if(args.Top.HasValue)
             {
                 query = query.Take(args.Top.Value);
+            }
+            else
+            {
+                query = query.Take(10); // Default to 100 items if Top is not specified
             }
 
             Data = query.ToList();
