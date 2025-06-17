@@ -1,0 +1,136 @@
+﻿@using Radzen.Blazor;
+@using Humanizer;
+
+@rendermode InteractiveServer
+
+@page "/"
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <RadzenTextBox @oninput="OnInput" />
+    <RadzenText @bind-Text=@Filter/>
+    <RadzenText @bind-Text=@SelectedItem/>
+     
+    <RadzenLookup @ref=lookup
+                  TValue="Model"
+                  AllowClear="true"
+                  AllowVirtualization="true"
+                  Data="@Data"
+                  LoadData="LoadData"
+                  Count=@Count
+                  PageSize="@PageSize"
+                  TextProperty="Name"
+                  Style="width: 100%;"
+                  SearchText="@Filter"
+                  SelectedItemChanged="SelectItem" />
+</RadzenStack>
+
+
+
+@code
+{
+    RadzenLookup<Model> lookup;
+
+    public int PageSize { get; set; } = 20;
+    string? Filter { get; set; }
+    List<Model> Database { get; set; } = new List<Model>();
+    List<Model> StaticData => Database.Skip(0).Take(100).ToList(); // For static data example
+    List<Model>? Data { get; set; } = new List<Model>();
+    public int Count { get; set; } = 0;
+
+    bool IsLoading { get; set; } = false;
+
+    string? SelectedItem { get; set; }
+
+    Model? CurrentItem { get; set; }
+
+    string? TextValue { get; set; }
+
+    void SelectItem(object item)
+    {
+        if(item is Model model)
+        {
+            SelectedItem = model.Name;
+            TextValue = model.Name;
+        }
+        else
+        {
+            SelectedItem = null;
+            TextValue = null;
+        }
+
+        Filter = string.Empty;
+        lookup.Reset();
+
+    }
+
+    void OnInput(Microsoft.AspNetCore.Components.ChangeEventArgs args) 
+    { 
+        this.Filter = args.Value?.ToString(); 
+        lookup.Reset();
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        try
+        {
+            IsLoading = true;
+
+            this.Data = Database
+                .Where(x => string.IsNullOrEmpty(this.Filter) || x.Name.Contains(this.Filter, StringComparison.OrdinalIgnoreCase))
+                .Skip(args.Skip.GetValueOrDefault())
+                .Take(args.Top.GetValueOrDefault(20))
+                .ToList();
+
+            var first = this.Data.FirstOrDefault();
+
+            if(first is Model model)
+            {
+                CurrentItem = model;
+            }
+            else
+            {
+                CurrentItem = null;
+
+            }
+
+            Count = Database
+                    .Count(x => string.IsNullOrEmpty(this.Filter) || x.Name.Contains(this.Filter, StringComparison.OrdinalIgnoreCase));
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        // Initialize any data or state here if needed
+
+        for (int i = 0; i < 10000; i++)
+        {
+            Database.Add(new Model(i));
+        }
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    public class Model
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+
+        public Model(int id)
+        {
+            this.Id = id;
+            this.Name = id.ToWords();
+        }
+    }
+}
