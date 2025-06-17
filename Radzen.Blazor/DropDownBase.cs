@@ -1086,7 +1086,7 @@ namespace Radzen
         /// </summary>
         void SetSelectedIndexFromSelectedItem()
         {
-            if (selectedItem != null)
+            if (selectedItem != null && View != null)
             {
                 if (typeof(EnumerableQuery).IsAssignableFrom(View.GetType()))
                 {

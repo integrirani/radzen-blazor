@@ -248,26 +248,28 @@ namespace Radzen.Blazor
         /// Handles the <see cref="E:Change" /> event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
-        protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
-        {
-            Value = (TValue)args.Value;
+        //protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
+        //{
+        //    Value = (TValue)args.Value;
 
-            await ValueChanged.InvokeAsync(Value);
-            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
-            await Change.InvokeAsync(Value);
+        //    await ValueChanged.InvokeAsync(Value);
+        //    if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+        //    await Change.InvokeAsync(Value);
 
-            await SelectedItemChanged.InvokeAsync(null);
-        }
+        //    await SelectedItemChanged.InvokeAsync(null);
+        //}
+
+        [Parameter]
+        public string TextValue { get; set; }
 
         async System.Threading.Tasks.Task SelectItem(object item)
         {
+            Value = (TValue)item;
+            selectedItem = item;
+
             if (!string.IsNullOrEmpty(TextProperty))
             {
-                Value = (TValue)PropertyAccess.GetItemOrValueFromProperty(item, TextProperty);
-            }
-            else
-            {
-                Value = (TValue)item;
+                TextValue = (string)PropertyAccess.GetItemOrValueFromProperty(item, TextProperty);
             }
 
             await ValueChanged.InvokeAsync(Value);
