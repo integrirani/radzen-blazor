@@ -6,8 +6,6 @@
 @page "/"
 
 <RadzenStack Orientation="Orientation.Vertical">
-    <RadzenTextBox @oninput="OnInput" />
-    <RadzenText @bind-Text=@Filter/>
     <RadzenText @bind-Text=@SelectedItem/>
      
     <RadzenLookup @ref=lookup
@@ -20,7 +18,6 @@
                   PageSize="@PageSize"
                   TextProperty="Name"
                   Style="width: 100%;"
-                  SearchText="@Filter"
                   SelectedItemChanged="SelectItem" />
 </RadzenStack>
 
@@ -58,16 +55,16 @@
             TextValue = null;
         }
 
-        Filter = string.Empty;
+        //Filter = string.Empty;
         //lookup.Reset();
 
     }
 
-    void OnInput(Microsoft.AspNetCore.Components.ChangeEventArgs args) 
-    { 
-        this.Filter = args.Value?.ToString(); 
-        lookup.Reset();
-    }
+    // void OnInput(Microsoft.AspNetCore.Components.ChangeEventArgs args) 
+    // { 
+    //     this.Filter = args.Value?.ToString(); 
+    //     lookup.Reset();
+    // }
 
     void LoadData(LoadDataArgs args)
     {
@@ -76,7 +73,7 @@
             IsLoading = true;
 
             this.Data = Database
-                .Where(x => string.IsNullOrEmpty(this.Filter) || x.Name.Contains(this.Filter, StringComparison.OrdinalIgnoreCase))
+                .Where(x => string.IsNullOrEmpty(args.Filter) || x.Name.Contains(args.Filter, StringComparison.OrdinalIgnoreCase))
                 .Skip(args.Skip.GetValueOrDefault())
                 .Take(args.Top.GetValueOrDefault(20))
                 .ToList();
@@ -94,7 +91,7 @@
             }
 
             Count = Database
-                    .Count(x => string.IsNullOrEmpty(this.Filter) || x.Name.Contains(this.Filter, StringComparison.OrdinalIgnoreCase));
+                    .Count(x => string.IsNullOrEmpty(args.Filter) || x.Name.Contains(args.Filter, StringComparison.OrdinalIgnoreCase));
         }
         catch (Exception ex)
         {

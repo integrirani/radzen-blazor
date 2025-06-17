@@ -200,14 +200,6 @@ namespace Radzen.Blazor
             }
         }
 
-        private string PopupID
-        {
-            get
-            {
-                return $"popup{UniqueID}";
-            }
-        }
-
         private async Task OnSelectItem(object item)
         {
             await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
@@ -239,8 +231,10 @@ namespace Radzen.Blazor
                 {
                     return Query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
                 }
-
-                return null;
+                else
+                {
+                    return Data;
+                }
             }
         }
 
