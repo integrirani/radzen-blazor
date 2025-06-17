@@ -8,14 +8,11 @@
 <RadzenStack Orientation="Orientation.Vertical">
     <RadzenText @bind-Text=@SelectedItem/>
      
-    <RadzenLookup @ref=lookup
-                  TValue="Model"
-                  AllowClear="true"
+    <RadzenLookup TValue="Model"
                   AllowVirtualization="true"
                   Data="@Data"
                   LoadData="LoadData"
                   Count=@Count
-                  PageSize="@PageSize"
                   TextProperty="Name"
                   Style="width: 100%;"
                   SelectedItemChanged="SelectItem" />
@@ -25,16 +22,9 @@
 
 @code
 {
-    RadzenLookup<Model> lookup;
-
-    public int PageSize { get; set; } = 20;
-    string? Filter { get; set; }
     List<Model> Database { get; set; } = new List<Model>();
-    List<Model> StaticData => Database.Skip(0).Take(100).ToList(); // For static data example
     List<Model>? Data { get; set; } = new List<Model>();
     public int Count { get; set; } = 0;
-
-    bool IsLoading { get; set; } = false;
 
     string? SelectedItem { get; set; }
 
@@ -54,41 +44,26 @@
             SelectedItem = null;
             TextValue = null;
         }
-
-        //Filter = string.Empty;
-        //lookup.Reset();
-
     }
-
-    // void OnInput(Microsoft.AspNetCore.Components.ChangeEventArgs args) 
-    // { 
-    //     this.Filter = args.Value?.ToString(); 
-    //     lookup.Reset();
-    // }
 
     void LoadData(LoadDataArgs args)
     {
         try
         {
-            IsLoading = true;
+            var query = Database
+                .Where(x => string.IsNullOrEmpty(args.Filter) || x.Name.Contains(args.Filter, StringComparison.OrdinalIgnoreCase));
 
-            this.Data = Database
-                .Where(x => string.IsNullOrEmpty(args.Filter) || x.Name.Contains(args.Filter, StringComparison.OrdinalIgnoreCase))
-                .Skip(args.Skip.GetValueOrDefault())
-                .Take(args.Top.GetValueOrDefault(20))
-                .ToList();
-
-            var first = this.Data.FirstOrDefault();
-
-            if(first is Model model)
+            if(args.Skip.HasValue)
             {
-                CurrentItem = model;
+                query = query.Skip(args.Skip.Value);
             }
-            else
-            {
-                CurrentItem = null;
 
+            if(args.Top.HasValue)
+            {
+                query = query.Take(args.Top.Value);
             }
+
+            Data = query.ToList();
 
             Count = Database
                     .Count(x => string.IsNullOrEmpty(args.Filter) || x.Name.Contains(args.Filter, StringComparison.OrdinalIgnoreCase));
@@ -96,10 +71,6 @@
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-        }
-        finally
-        {
-            IsLoading = false;
         }
     }
 
@@ -112,11 +83,6 @@
         {
             Database.Add(new Model(i));
         }
-    }
-
-    protected override Task OnAfterRenderAsync(bool firstRender)
-    {
-        return base.OnAfterRenderAsync(firstRender);
     }
 
     public class Model

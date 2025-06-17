@@ -196,6 +196,7 @@ namespace Radzen.Blazor
             else
             {
                 customSearchText = value;
+                searchText = value;
                 await InvokeAsync(() => { LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Filter = customSearchText }); });
             }
         }
