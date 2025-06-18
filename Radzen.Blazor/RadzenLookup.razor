@@ -25,7 +25,7 @@
                    type="@InputType" id="@Name" aria-expanded="true" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
         }
         <div id="@PopupID" class="rz-autocomplete-panel" style="@PopupStyle">
-            <ul @ref="@list" class="rz-autocomplete-items rz-autocomplete-list" role="listbox">
+            <ul @ref="@list" class="rz-autocomplete-items rz-autocomplete-list" role="listbox" style="height: 300px;">
                 @if (OpenOnFocus || (!string.IsNullOrEmpty(searchText)))
                 {
                     @RenderItems() 

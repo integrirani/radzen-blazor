@@ -157,7 +157,7 @@ namespace Radzen.Blazor
             }
             else
             {
-                selectedIndex = -1;
+                //selectedIndex = -1;
 
                 Debounce(DebounceFilter, FilterDelay);
             }
@@ -183,7 +183,8 @@ namespace Radzen.Blazor
             else
             {
                 searchText = value;
-                await InvokeAsync(() => { LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Filter = searchText }); });
+                await InvokeAsync(() => { virtualize.RefreshDataAsync(); });
+                await InvokeAsync(() => { this.StateHasChanged(); });
             }
         }
 
